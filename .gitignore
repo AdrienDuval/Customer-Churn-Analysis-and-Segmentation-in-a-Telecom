@@ -3,3 +3,11 @@
 __pycache__/
 .env
 .venv
+
+# Model files (uncomment if you don't want to commit models)
+# models/*.joblib
+# models/*.pkl
+# models/*.pkl.gz
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/

@@ -1,0 +1,28 @@
+# Core
+numpy
+pandas
+
+# Visualization
+matplotlib
+seaborn
+
+# Machine Learning
+scikit-learn
+xgboost
+
+# Notebook
+jupyter
+ipykernel
+
+# Model persistence
+joblib
+
+# API
+fastapi
+uvicorn
+
+# Data handling
+openpyxl
+
+# Optional (quality & convenience)
+python-dotenv

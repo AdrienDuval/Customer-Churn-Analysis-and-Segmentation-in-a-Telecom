@@ -1,9 +1,17 @@
 # Data Science Project  
 ## Customer Churn Analysis and Segmentation in a Telecom / SaaS Context
 
+## Table of Contents
+
+- [Quick Start](#quick-start) ⚡
+- [API Documentation](#api-documentation)
+- [Context and Business Background](#1-context-and-business-background)
+- [Problem Statement](#2-problem-statement)
+- [Dataset Description](#3-dataset-description)
+
 ---
 
-## 1. Context and Business Background
+## 1. Context and Business Background {#1-context-and-business-background}
 
 Telecom and SaaS companies operate on a **subscription-based business model**, where recurring revenue depends on customers staying over time.
 
@@ -20,7 +28,7 @@ This project addresses this challenge using data science techniques to:
 
 ---
 
-## 2. Problem Statement
+## 2. Problem Statement {#2-problem-statement}
 
 The project is structured around the following key business questions:
 
@@ -32,7 +40,7 @@ This problem is approached from two complementary angles:
 
 ---
 
-## 3. Dataset Description
+## 3. Dataset Description {#3-dataset-description}
 
 ### 3.1 Dataset Overview
 
@@ -53,7 +61,7 @@ Each row represents one customer, with attributes related to:
 
 ---
 
-## Quick Start
+## Quick Start {#quick-start}
 
 ### Prerequisites
 - Docker installed ([Download Docker](https://www.docker.com/get-started))
@@ -122,7 +130,9 @@ GET /sample-data
 }
 ```
 
-You can also use the `sample_data.json` file in the project root.
+You can also use the sample data files in the project root:
+- `sample_data.json` - Array format (for `/predict/batch/simple`)
+- `sample_data_batch.json` - Wrapped format (for `/predict/batch`)
 
 ### Prediction Endpoints
 
@@ -159,8 +169,50 @@ POST /predict/batch?model_version=v1_lr
 ```json
 {
   "customers": [
-    { /* customer 1 data */ },
-    { /* customer 2 data */ }
+    {
+      "Gender": "Male",
+      "Senior Citizen": "No",
+      "Partner": "Yes",
+      "Dependents": "No",
+      "Phone Service": "Yes",
+      "Multiple Lines": "No",
+      "Internet Service": "Fiber optic",
+      "Online Security": "No",
+      "Online Backup": "Yes",
+      "Device Protection": "No",
+      "Tech Support": "No",
+      "Streaming TV": "Yes",
+      "Streaming Movies": "Yes",
+      "Contract": "Month-to-month",
+      "Paperless Billing": "Yes",
+      "Payment Method": "Electronic check",
+      "Tenure Months": 5,
+      "Monthly Charges": 89.5,
+      "Total Charges": 450.2,
+      "CLTV": 3200
+    },
+    {
+      "Gender": "Female",
+      "Senior Citizen": "Yes",
+      "Partner": "No",
+      "Dependents": "No",
+      "Phone Service": "Yes",
+      "Multiple Lines": "Yes",
+      "Internet Service": "DSL",
+      "Online Security": "Yes",
+      "Online Backup": "Yes",
+      "Device Protection": "Yes",
+      "Tech Support": "Yes",
+      "Streaming TV": "No",
+      "Streaming Movies": "No",
+      "Contract": "Two year",
+      "Paperless Billing": "No",
+      "Payment Method": "Credit card (automatic)",
+      "Tenure Months": 45,
+      "Monthly Charges": 65.8,
+      "Total Charges": 2961.0,
+      "CLTV": 5800
+    }
   ]
 }
 ```
@@ -172,16 +224,43 @@ POST /predict/batch?model_version=v1_lr
   "predictions": [
     {
       "customer_index": 0,
-      "input": { /* original customer data */ },
+      "input": {
+        "Gender": "Male",
+        "Senior Citizen": "No",
+        ...
+      },
       "prediction": {
         "churn_prediction": 1,
         "churn_probability": 0.85,
         "churn_label": "Yes"
       }
+    },
+    {
+      "customer_index": 1,
+      "input": {
+        "Gender": "Female",
+        "Senior Citizen": "Yes",
+        ...
+      },
+      "prediction": {
+        "churn_prediction": 0,
+        "churn_probability": 0.23,
+        "churn_label": "No"
+      }
     }
   ]
 }
 ```
+
+**Alternative: Simple Batch (Direct Array)**
+
+If you prefer to send an array directly without the wrapper:
+
+```http
+POST /predict/batch/simple?model_version=v1_lr
+```
+
+**Request Body:** Direct array (same customer objects, but without the `{"customers": [...]}` wrapper)
 
 ### Other Endpoints
 
@@ -200,17 +279,31 @@ POST /predict/batch?model_version=v1_lr
    curl http://localhost:8000/sample-data
    ```
 
-3. **Make a prediction:**
+3. **Make a single prediction:**
    ```bash
+   # Use the first customer from sample_data.json
    curl -X POST "http://localhost:8000/predict/v1_lr" \
      -H "Content-Type: application/json" \
-     -d @sample_data.json
+     -d '{
+       "Gender": "Male",
+       "Senior Citizen": "No",
+       ...
+     }'
    ```
 
-4. **Or use the interactive docs:**
-   - Click on `/sample-data` endpoint
-   - Copy the response data
-   - Use it with `/predict/v1_lr`, `/predict/v2_rf`, or `/predict/v3_gb`
+4. **Make batch predictions (multiple customers):**
+   ```bash
+   # Use sample_data_batch.json (wrapped format)
+   curl -X POST "http://localhost:8000/predict/batch?model_version=v1_lr" \
+     -H "Content-Type: application/json" \
+     -d @sample_data_batch.json
+   ```
+
+5. **Or use the interactive docs:**
+   - Click on `/sample-data` endpoint to get sample data
+   - Copy the entire response (it's already in the correct format)
+   - Paste it directly into `/predict/batch?model_version=v1_lr` endpoint
+   - For single prediction: Extract one customer object and use `/predict/v1_lr`, `/predict/v2_rf`, or `/predict/v3_gb`
 
 ---
 
@@ -226,4 +319,6 @@ docker-compose up --build
 - Get sample data: `GET /sample-data`
 - Make prediction: `POST /predict/v1_lr` (or v2_rf, v3_gb)
 
-**Sample data file:** `sample_data.json` in the project root
+**Sample data files:**
+- `sample_data.json` - Array format (for batch/simple endpoint)
+- `sample_data_batch.json` - Wrapped format (for batch endpoint)

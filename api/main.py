@@ -204,10 +204,10 @@ async def list_models():
     "/sample-data",
     tags=["General"],
     summary="Get sample customer data",
-    description="Returns sample customer data that can be used for testing predictions"
+    description="Returns sample customer data in ready-to-use format for batch predictions. Copy and paste directly into /predict/batch endpoint."
 )
 async def get_sample_data():
-    """Get sample customer data for testing."""
+    """Get sample customer data in wrapped format ready for batch predictions."""
     import json
     from pathlib import Path
     
@@ -219,17 +219,14 @@ async def get_sample_data():
         if sample_file.exists():
             with open(sample_file, 'r') as f:
                 sample_data = json.load(f)
+            # Return in wrapped format ready for batch endpoint
             return {
-                "message": "Sample customer data",
-                "count": len(sample_data),
-                "data": sample_data
+                "customers": sample_data
             }
         else:
             # Return a single example if file doesn't exist
             return {
-                "message": "Sample customer data",
-                "count": 1,
-                "data": [{
+                "customers": [{
                     "Gender": "Male",
                     "Senior Citizen": "No",
                     "Partner": "Yes",

@@ -53,196 +53,177 @@ Each row represents one customer, with attributes related to:
 
 ---
 
-### 3.2 Key Variables
+## Quick Start
 
-- **Customer information**: Gender, Age, Senior Citizen, Partner, Dependents  
-- **Subscription & contract**: Tenure Months, Contract Type, Payment Method  
-- **Services**: Internet Service, Streaming, Tech Support, Online Security, etc.  
-- **Billing & value**: Monthly Charges, Total Charges, CLTV  
-- **Churn indicators**: Churn Label, Churn Value  
+### Prerequisites
+- Docker installed ([Download Docker](https://www.docker.com/get-started))
 
----
+### Setup
 
-### 3.3 Target Variable
+```bash
+# Clone the repository
+git clone <repository-url>
+cd FinalProject
 
-For supervised learning, the target variable is:
+# Start the API
+docker-compose up --build
+```
 
-- **Churn Value**  
-  - `1` → Customer churned  
-  - `0` → Customer stayed  
-
-This binary variable allows a clear classification task.
+The API will be available at **http://localhost:8000**
 
 ---
 
-## 4. Exploratory Data Analysis (EDA)
+## API Documentation
 
-The EDA phase aims to understand the dataset before modeling.
+### Available Models
 
-Key steps include:
-- data structure and data types analysis,
-- missing value detection and handling,
-- distribution analysis of numerical variables,
-- churn rate analysis,
-- relationship analysis between features and churn.
+The API provides access to three trained models:
+- **v1_lr**: Logistic Regression
+- **v2_rf**: Random Forest  
+- **v3_gb**: Gradient Boosting
 
-EDA allows us to identify:
-- important churn drivers,
-- class imbalance,
-- outliers and data quality issues,
-- meaningful patterns for modeling.
+### Getting Sample Data
 
----
+To get sample customer data for testing:
 
-## 5. Unsupervised Learning: Customer Segmentation
+```http
+GET /sample-data
+```
 
-### 5.1 Objective
+**Response:**
+```json
+{
+  "message": "Sample customer data",
+  "count": 3,
+  "data": [
+    {
+      "Gender": "Male",
+      "Senior Citizen": "No",
+      "Partner": "Yes",
+      "Dependents": "No",
+      "Phone Service": "Yes",
+      "Multiple Lines": "No",
+      "Internet Service": "Fiber optic",
+      "Online Security": "No",
+      "Online Backup": "Yes",
+      "Device Protection": "No",
+      "Tech Support": "No",
+      "Streaming TV": "Yes",
+      "Streaming Movies": "Yes",
+      "Contract": "Month-to-month",
+      "Paperless Billing": "Yes",
+      "Payment Method": "Electronic check",
+      "Tenure Months": 5,
+      "Monthly Charges": 89.5,
+      "Total Charges": 450.2,
+      "CLTV": 3200
+    }
+  ]
+}
+```
 
-The goal of the unsupervised analysis is **not to predict churn**, but to answer:
+You can also use the `sample_data.json` file in the project root.
 
-> **What types of customers does the company have?**
+### Prediction Endpoints
 
-Customer segmentation helps the business understand:
-- different behavior profiles,
-- value differences between customers,
-- which segments require specific strategies.
+#### Single Prediction
 
----
+```http
+POST /predict/v1_lr
+POST /predict/v2_rf
+POST /predict/v3_gb
+```
 
-### 5.2 Variables Used
+**Request Body:** Customer data (use data from `/sample-data` endpoint)
 
-Only **behavioral, usage, and value-related variables** are used.
+**Response:**
+```json
+{
+  "churn_prediction": 1,
+  "churn_probability": 0.85,
+  "churn_label": "Yes"
+}
+```
 
-Examples:
-- Tenure Months  
-- Monthly Charges  
-- Total Charges  
-- Number of subscribed services (engineered feature)  
-- Contract Type  
-- Payment Method  
-- CLTV  
+- `churn_prediction`: 0 (No churn) or 1 (Churn)
+- `churn_probability`: Probability of churn (0-1)
+- `churn_label`: "Yes" or "No"
 
-All churn-related variables are **excluded** to avoid bias.
+#### Batch Prediction
 
----
+```http
+POST /predict/batch?model_version=v1_lr
+```
 
-### 5.3 Methods
+**Request Body:**
+```json
+{
+  "customers": [
+    { /* customer 1 data */ },
+    { /* customer 2 data */ }
+  ]
+}
+```
 
-- Data scaling (standardization)
-- Dimensionality reduction (PCA) for visualization
-- Clustering algorithms (e.g., K-Means)
+**Response:**
+```json
+{
+  "total_customers": 2,
+  "predictions": [
+    {
+      "customer_index": 0,
+      "input": { /* original customer data */ },
+      "prediction": {
+        "churn_prediction": 1,
+        "churn_probability": 0.85,
+        "churn_label": "Yes"
+      }
+    }
+  ]
+}
+```
 
----
+### Other Endpoints
 
-### 5.4 Expected Outcomes
+- `GET /health` - Check API and model status
+- `GET /models` - List all available models and their status
+- `GET /model/info?model_version=v1_lr` - Get information about a specific model
 
-The clustering process may reveal segments such as:
-- long-term loyal customers,
-- high-value but dissatisfied customers,
-- low-usage, high-risk customers,
-- new customers with uncertain behavior.
+### Testing the API
 
----
+1. **Open interactive documentation:**
+   - Navigate to http://localhost:8000/docs in your browser
+   - This provides a Swagger UI to test all endpoints
 
-### 5.5 Business Value of Segmentation
+2. **Get sample data:**
+   ```bash
+   curl http://localhost:8000/sample-data
+   ```
 
-Customer segmentation allows the company to:
-- design targeted retention strategies,
-- prioritize high-value customers,
-- allocate marketing and support resources efficiently,
-- avoid one-size-fits-all retention campaigns.
+3. **Make a prediction:**
+   ```bash
+   curl -X POST "http://localhost:8000/predict/v1_lr" \
+     -H "Content-Type: application/json" \
+     -d @sample_data.json
+   ```
 
----
-
-## 6. Supervised Learning: Churn Prediction
-
-### 6.1 Objective
-
-The supervised learning task aims to answer:
-
-> **Which customers are likely to churn in the near future?**
-
-This enables proactive intervention before the customer leaves.
-
----
-
-### 6.2 Features Used
-
-Only variables **available before churn occurs** are used to avoid data leakage.
-
-Categories of features:
-- customer profile (age, family status),
-- contract characteristics,
-- service usage,
-- billing and payment behavior.
-
-Excluded variables:
-- Churn Reason,
-- Churn Score,
-- Customer ID.
-
----
-
-### 6.3 Modeling Approach
-
-- Train-test split
-- Models such as:
-  - Logistic Regression
-  - Random Forest
-- Evaluation using:
-  - Accuracy
-  - Recall (important to detect churners)
-  - ROC-AUC
-
----
-
-### 6.4 Model Output
-
-The model produces:
-- a churn prediction (yes / no),
-- or a churn probability score for each customer.
-
----
-
-## 7. Business Implications
-
-The results of this project can be directly translated into business actions:
-
-- proactive retention campaigns for high-risk customers,
-- personalized offers based on customer segment,
-- optimized customer support prioritization,
-- reduction of unnecessary discounts to low-risk customers.
-
-Ultimately, this leads to:
-- lower churn rate,
-- higher customer lifetime value,
-- improved profitability.
+4. **Or use the interactive docs:**
+   - Click on `/sample-data` endpoint
+   - Copy the response data
+   - Use it with `/predict/v1_lr`, `/predict/v2_rf`, or `/predict/v3_gb`
 
 ---
 
-## 8. Project Value and Conclusion
+## Quick Reference
 
-This project demonstrates a **complete data science workflow**:
-- business understanding,
-- data exploration,
-- unsupervised learning for insight generation,
-- supervised learning for prediction,
-- business-oriented interpretation.
+**Start API:**
+```bash
+docker-compose up --build
+```
 
-It reflects a **real-world use case** commonly encountered in Telecom and SaaS companies and shows how data science can support strategic decision-making.
+**Access API:**
+- Interactive docs: http://localhost:8000/docs
+- Get sample data: `GET /sample-data`
+- Make prediction: `POST /predict/v1_lr` (or v2_rf, v3_gb)
 
----
-
-## 9. Limitations and Future Improvements
-
-- The dataset is not time-series based, limiting temporal churn prediction.
-- Future work could include:
-  - survival analysis,
-  - cost-sensitive modeling,
-  - integration of customer interaction logs.
-
----
-
-## 10. Final Summary
-
-> This project uses customer data to segment users, predict churn, and provide actionable insights that help a Telecom/SaaS company reduce revenue loss and improve customer retention through data-driven decisions.
+**Sample data file:** `sample_data.json` in the project root

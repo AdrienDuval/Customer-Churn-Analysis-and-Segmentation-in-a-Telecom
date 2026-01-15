@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  # Main API service with all models
+  churn-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: churn-prediction-api
+    ports:
+      - "8000:8000"
+    environment:
+      # CORS configuration (adjust for production)
+      - CORS_ORIGINS=*
+    volumes:
+      # Mount models directory for easy model updates without rebuild
+      - ./models:/app/models:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - churn-network
+
+  # Optional: Separate service for Logistic Regression model (v1_lr)
+  churn-api-v1-lr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: churn-prediction-api-v1-lr
+    ports:
+      - "8001:8000"
+    environment:
+      - CORS_ORIGINS=*
+      - MODEL_PATH=/app/models/churn_model_v1_lr.pkl
+    volumes:
+      - ./models:/app/models:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - churn-network
+    profiles:
+      - separate-services
+
+  # Optional: Separate service for Random Forest model (v2_rf)
+  churn-api-v2-rf:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: churn-prediction-api-v2-rf
+    ports:
+      - "8002:8000"
+    environment:
+      - CORS_ORIGINS=*
+      - MODEL_PATH=/app/models/churn_model_v2_rf.pkl
+    volumes:
+      - ./models:/app/models:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - churn-network
+    profiles:
+      - separate-services
+
+  # Optional: Separate service for Gradient Boosting model (v3_gb)
+  churn-api-v3-gb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: churn-prediction-api-v3-gb
+    ports:
+      - "8003:8000"
+    environment:
+      - CORS_ORIGINS=*
+      - MODEL_PATH=/app/models/churn_model_v3_gb.pkl
+    volumes:
+      - ./models:/app/models:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - churn-network
+    profiles:
+      - separate-services
+
+networks:
+  churn-network:
+    driver: bridge

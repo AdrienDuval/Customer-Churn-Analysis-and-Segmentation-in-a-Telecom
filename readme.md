@@ -73,11 +73,22 @@ Each row represents one customer, with attributes related to:
 git clone <repository-url>
 cd FinalProject
 
-# Start the API
+# Start the API and Frontend
 docker-compose up --build
 ```
 
-The API will be available at **http://localhost:8000**
+**Access Points:**
+- **Frontend Dashboard**: http://localhost (port 80) - Interactive web interface
+- **Backend API**: http://localhost:8000 - REST API
+- **API Documentation**: http://localhost:8000/docs - Swagger UI
+
+The frontend provides an intuitive interface to:
+- Select and switch between different ML models
+- Make single customer predictions with a user-friendly form
+- Process batch predictions with JSON input
+- View results with visual indicators and notes
+- Monitor API health and model status
+- Access backend API documentation directly
 
 ---
 

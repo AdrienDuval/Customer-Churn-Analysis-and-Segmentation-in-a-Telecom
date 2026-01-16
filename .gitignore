@@ -73,3 +73,16 @@ models/
 # Jupyter exports
 # ===============================
 *.nbconvert.ipynb
+
+# ===============================
+# Frontend / Node.js
+# ===============================
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.vite/

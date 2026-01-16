@@ -25,6 +25,20 @@ services:
     networks:
       - churn-network
 
+  # Frontend service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: churn-prediction-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - churn-api
+    restart: unless-stopped
+    networks:
+      - churn-network
+
   # Optional: Separate service for Logistic Regression model (v1_lr)
   churn-api-v1-lr:
     build:

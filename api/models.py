@@ -33,6 +33,13 @@ class MultipleLines(str, Enum):
     NO_PHONE_SERVICE = "No phone service"
 
 
+class YesNoNoInternet(str, Enum):
+    """Yes/No/No internet service options for internet-dependent features."""
+    YES = "Yes"
+    NO = "No"
+    NO_INTERNET_SERVICE = "No internet service"
+
+
 class Contract(str, Enum):
     """Contract type options."""
     MONTH_TO_MONTH = "Month-to-month"
@@ -57,12 +64,12 @@ class CustomerInput(BaseModel):
     Phone_Service: Annotated[YesNo, Field(..., alias="Phone Service", description="Whether customer has phone service")]
     Multiple_Lines: Annotated[MultipleLines, Field(..., alias="Multiple Lines", description="Multiple lines service")]
     Internet_Service: Annotated[InternetService, Field(..., alias="Internet Service", description="Type of internet service")]
-    Online_Security: Annotated[YesNo, Field(..., alias="Online Security", description="Online security service")]
-    Online_Backup: Annotated[YesNo, Field(..., alias="Online Backup", description="Online backup service")]
-    Device_Protection: Annotated[YesNo, Field(..., alias="Device Protection", description="Device protection service")]
-    Tech_Support: Annotated[YesNo, Field(..., alias="Tech Support", description="Tech support service")]
-    Streaming_TV: Annotated[YesNo, Field(..., alias="Streaming TV", description="Streaming TV service")]
-    Streaming_Movies: Annotated[YesNo, Field(..., alias="Streaming Movies", description="Streaming movies service")]
+    Online_Security: Annotated[YesNoNoInternet, Field(..., alias="Online Security", description="Online security service")]
+    Online_Backup: Annotated[YesNoNoInternet, Field(..., alias="Online Backup", description="Online backup service")]
+    Device_Protection: Annotated[YesNoNoInternet, Field(..., alias="Device Protection", description="Device protection service")]
+    Tech_Support: Annotated[YesNoNoInternet, Field(..., alias="Tech Support", description="Tech support service")]
+    Streaming_TV: Annotated[YesNoNoInternet, Field(..., alias="Streaming TV", description="Streaming TV service")]
+    Streaming_Movies: Annotated[YesNoNoInternet, Field(..., alias="Streaming Movies", description="Streaming movies service")]
     Contract: Annotated[Contract, Field(..., description="Contract type")]
     Paperless_Billing: Annotated[YesNo, Field(..., alias="Paperless Billing", description="Paperless billing option")]
     Payment_Method: Annotated[PaymentMethod, Field(..., alias="Payment Method", description="Payment method")]

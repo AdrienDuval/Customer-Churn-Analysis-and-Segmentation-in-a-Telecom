@@ -1,13 +1,75 @@
-.vscode/
-*.log
+# ===============================
+# Python virtual environments
+# ===============================
+.venv/
+venv/
+env/
+
+# ===============================
+# Python cache / bytecode
+# ===============================
 __pycache__/
-.env
-.venv
+*.py[cod]
+*$py.class
 
-# Model files (uncomment if you don't want to commit models)
-# models/*.joblib
-# models/*.pkl
-# models/*.pkl.gz
-
-# Jupyter notebook checkpoints
+# ===============================
+# Jupyter / IPython
+# ===============================
 .ipynb_checkpoints/
+.jupyter/
+.jupyterlab-workspaces/
+.jupyterlab-settings/
+
+# ===============================
+# VS Code / IDEs
+# ===============================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ===============================
+# Environment variables
+# ===============================
+.env
+.env.*
+!.env.example
+
+# ===============================
+# Logs
+# ===============================
+*.log
+logs/
+
+# ===============================
+# OS-specific
+# ===============================
+.DS_Store
+Thumbs.db
+
+# ===============================
+# Build / packaging
+# ===============================
+build/
+dist/
+*.egg-info/
+
+# ===============================
+# Test / coverage
+# ===============================
+.coverage
+htmlcov/
+.pytest_cache/
+
+# ===============================
+# Data / artifacts (if generated)
+# ===============================
+data/
+outputs/
+artifacts/
+models/
+
+# ===============================
+# Jupyter exports
+# ===============================
+*.nbconvert.ipynb
